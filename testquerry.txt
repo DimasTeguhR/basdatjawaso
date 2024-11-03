@@ -1,0 +1,180 @@
+1. Data Manipulation Language (DML)
+mencakup perintah INSERT, UPDATE, DELETE, dan SELECT.
+
+a. INSERT
+
+INSERT INTO customers (id, name, email, phone, address) 
+VALUES (1, 'John Doe', 'johndoe@example.com', '1234567890', '123 Main St');
+
+b. UPDATE
+
+UPDATE customers 
+SET phone = '0987654321' 
+WHERE id = 1;
+
+c. DELETE
+
+DELETE FROM customers 
+WHERE id = 1;
+
+d. SELECT
+
+SELECT * FROM customers;
+
+2. View Table
+
+CREATE VIEW available_products AS
+SELECT id, title, price, stok
+FROM product
+WHERE stok > 0;
+(melihat semua produk yang tersedia di stok tanpa perlu menulis ulang query)
+
+3. Stored Procedure
+menjalankan proses tertentu secara otomatis.
+
+DELIMITER //
+CREATE PROCEDURE AddCustomer(
+    IN cust_name VARCHAR(50),
+    IN cust_email VARCHAR(50),
+    IN cust_phone VARCHAR(15),
+    IN cust_address VARCHAR(100)
+)
+BEGIN
+    INSERT INTO customers (name, email, phone, address)
+    VALUES (cust_name, cust_email, cust_phone, cust_address);
+END //
+DELIMITER ;
+
+Stored procedure ini bisa dipanggil dengan perintah berikut:
+
+CALL AddCustomer('Jane Doe', 'janedoe@example.com', '1234567890', '456 Elm St');
+
+4. Function
+mengembalikan nilai tertentu berdasarkan input yang diberikan.
+membuat function untuk menghitung total harga pesanan berdasarkan order_id.
+
+DELIMITER //
+CREATE FUNCTION CalculateOrderTotal(orderId INT) 
+RETURNS DECIMAL(10, 2)
+DETERMINISTIC
+BEGIN
+    DECLARE total DECIMAL(10, 2);
+    SELECT SUM(price * quantity) INTO total
+    FROM orders
+    WHERE id = orderId;
+    RETURN total;
+END //
+DELIMITER ;
+
+Function ini bisa digunakan dalam query:
+
+SELECT CalculateOrderTotal(1) AS total_price;
+
+5. Trigger
+menjalankan aksi tertentu secara otomatis ketika terjadi perubahan pada tabel.
+buat trigger untuk memperbarui stok produk saat ada pesanan baru.
+
+DELIMITER //
+CREATE TRIGGER update_stock_after_order 
+AFTER INSERT ON orders
+FOR EACH ROW
+BEGIN
+    UPDATE product
+    SET stok = stok - NEW.quantity
+    WHERE id = NEW.productId;
+END //
+DELIMITER ;
+
+Trigger ini akan mengurangi stok produk secara otomatis setelah pesanan baru ditambahkan.
+
+6. Commit dan Rollback
+melakukan beberapa operasi sebagai satu unit kerja, dan menggunakan COMMIT atau ROLLBACK untuk menyimpan atau membatalkan perubahan.
+
+START TRANSACTION;
+-- Contoh update stok produk
+UPDATE product SET stok = stok - 2 WHERE id = 1;
+-- Coba commit untuk menyimpan perubahan
+COMMIT;
+
+Jika terjadi error atau ingin membatalkan transaksi, kita dapat melakukan ROLLBACK sebelum COMMIT.
+
+START TRANSACTION;
+UPDATE product SET stok = stok - 2 WHERE id = 1;
+-- Rollback jika ada kesalahan
+ROLLBACK;
+
+7. Index
+
+-- Membuat indeks untuk percepatan pencarian berdasarkan categoryId
+CREATE INDEX idx_category ON product (categoryId);
+
+-- Membuat indeks untuk percepatan pencarian berdasarkan title
+CREATE INDEX idx_title ON product (title);
+
+8. Algoritma Sorting dan Searching di Basis Data
+
+a. Sorting (Mengurutkan Produk Berdasarkan Harga)
+
+SELECT * FROM product
+ORDER BY price ASC; -- Mengurutkan dari harga terendah ke tertinggi
+
+b. Searching (Mencari Produk Berdasarkan Nama Produk Menggunakan LIKE)
+
+SELECT * FROM product
+WHERE title LIKE '%dekorasi%'; -- Mencari produk yang mengandung kata "dekorasi" di nama produk
+
+9. Identifikasi Perubahan Data
+
+CREATE TABLE product_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT,
+    action VARCHAR(10),
+    old_price INT,
+    new_price INT,
+    change_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DELIMITER //
+CREATE TRIGGER after_product_update
+AFTER UPDATE ON product
+FOR EACH ROW
+BEGIN
+    INSERT INTO product_log (product_id, action, old_price, new_price)
+    VALUES (OLD.id, 'update', OLD.price, NEW.price);
+END //
+DELIMITER ;
+
+Trigger ini akan otomatis memasukkan data ke dalam product_log setiap kali data harga diubah, sehingga perubahan dapat teridentifikasi.
+
+10. Peringatan pada Batasan Tertentu
+
+DELIMITER //
+CREATE TRIGGER stock_warning
+AFTER UPDATE ON product
+FOR EACH ROW
+BEGIN
+    IF NEW.stok < 5 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Peringatan: Stok produk kurang dari 5';
+    END IF;
+END //
+DELIMITER ;
+
+Jika stok diperbarui menjadi kurang dari 5, trigger ini akan menghasilkan pesan peringatan.
+
+11. Hak Akses
+
+Tambah
+CREATE USER 'limited_user'@'localhost' IDENTIFIED BY 'password123';
+
+Memberikan Hak Akses Tertentu
+-- Memberikan hak SELECT saja pada tabel product untuk limited_user
+GRANT SELECT ON database_name.product TO 'limited_user'@'localhost';
+
+-- Memberikan hak penuh (SELECT, INSERT, UPDATE, DELETE) kepada admin_user pada semua tabel
+GRANT ALL PRIVILEGES ON database_name.* TO 'admin_user'@'localhost';
+
+Merevoke Akses
+cabut hak akses
+
+REVOKE SELECT ON database_name.product FROM 'limited_user'@'localhost';

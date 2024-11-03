@@ -4,12 +4,12 @@ include "./genral/config.php";
 include "./genral/functions.php";
 
 // Dimas Teguh Ramadhani
- $slecet = "SELECT * FROM product";
-$s = mysqli_query($connectSQL ,$slecet );
- $slecetMen = "SELECT category.name AS categoryName , product.id , product.title , product.descriptions , product.price , product.image FROM category JOIN product ON categoryId = category.id AND product.categoryId = 1";
-$sMen = mysqli_query($connectSQL ,$slecetMen );
- $slecetFmale = "SELECT category.name AS categoryName , product.id , product.title , product.descriptions , product.price , product.image FROM category JOIN product ON categoryId = category.id AND product.categoryId = 2";
-$sFmale = mysqli_query($connectSQL ,$slecetFmale );
+ $select = "SELECT * FROM product";
+$s = mysqli_query($connectSQL ,$select );
+ $selectMen = "SELECT category.name AS categoryName , product.id , product.title , product.descriptions , product.price , product.image FROM category JOIN product ON categoryId = category.id AND product.categoryId = 1";
+$sMen = mysqli_query($connectSQL ,$selectMen );
+ $selectFmale = "SELECT category.name AS categoryName , product.id , product.title , product.descriptions , product.price , product.image FROM category JOIN product ON categoryId = category.id AND product.categoryId = 2";
+$sFmale = mysqli_query($connectSQL ,$selectFmale );
 // get search
 if(isset($_GET['search'])){
   $search = $_GET['search_term'];
