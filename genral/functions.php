@@ -10,7 +10,7 @@ function testMessage($condation , $mess){
         </div>";
     }
 }
-
+// Fungsi untuk mengautentikasi admin agar hanya bisa mengakses halaman tertentu
 function authAdmin(){
     $root_path = $GLOBALS['root_path'];
     if(!$_SESSION['admin']){
@@ -18,6 +18,7 @@ function authAdmin(){
         exit;
     }
 }
+// Fungsi untuk mengecek apakah admin sudah login, jika iya maka diarahkan ke dashboard
 function checkLogin(){
     $root_path = $GLOBALS['root_path'];
     if(isset($_SESSION['admin'])){
@@ -25,7 +26,7 @@ function checkLogin(){
         exit;
     }
 }
-
+// Fungsi untuk mengatur izin akses berdasarkan peran admin
 function permissionsAdmin($role){
     $root_path = $GLOBALS['root_path'];
     if($_SESSION['admin']){
@@ -40,6 +41,7 @@ function permissionsAdmin($role){
     }
 
 }
+// Fungsi untuk memeriksa izin akses pengguna (customer)
 function userPermissions(){
     $root_path = $GLOBALS['root_path'];
     if($_SESSION['customer']){
@@ -48,6 +50,7 @@ function userPermissions(){
         header("location: $root_path/user/login.php");
     }
 }
+// Fungsi untuk mencegah pengguna yang telah login mengakses halaman tertentu
 function notUserPermissions(){
     $root_path = $GLOBALS['root_path'];
     if(isset($_SESSION['customer']) ){

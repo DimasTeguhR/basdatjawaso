@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 03 Nov 2024 pada 06.12
+-- Waktu pembuatan: 10 Nov 2024 pada 04.11
 -- Versi server: 10.4.25-MariaDB
 -- Versi PHP: 8.1.10
 
@@ -52,6 +52,19 @@ CREATE TABLE `admins` (
 
 INSERT INTO `admins` (`id`, `name`, `email`, `password`, `roles`) VALUES
 (1, 'admin', 'admin@gmail.com', '123', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in struktur untuk tampilan `available_products`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `available_products` (
+`id` int(11)
+,`title` varchar(50)
+,`price` int(11)
+,`stok` int(11)
+);
 
 -- --------------------------------------------------------
 
@@ -151,7 +164,7 @@ DELIMITER ;
 
 CREATE TABLE `comment_blog` (
   `id_comment` int(11) NOT NULL,
-  `comment` text NOT NULL,
+  `comment` char(255) NOT NULL,
   `customer_Id` int(11) NOT NULL,
   `blog_Id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -169,17 +182,18 @@ CREATE TABLE `customers` (
   `password` varchar(12) NOT NULL,
   `phone` varchar(12) NOT NULL,
   `address` varchar(256) NOT NULL,
-  `image_user` text DEFAULT 'pp.png'
+  `image_user` text DEFAULT 'pp.png',
+  `tgl_lahir` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `customers`
 --
 
-INSERT INTO `customers` (`id`, `name`, `email`, `password`, `phone`, `address`, `image_user`) VALUES
-(1, 'Dimas', 'Dimas@gmail.com', '1234', '01234567891', 'Bumiayu Brebes', 'pp.png'),
-(8, 'Test123', 'Test123@gmail.com', '1235', '12345678910', 'Test', 'pp.png'),
-(9, 'Test123', 'Test1234@gmail.com', '1234', '123412512412', 'Test', 'pp.png');
+INSERT INTO `customers` (`id`, `name`, `email`, `password`, `phone`, `address`, `image_user`, `tgl_lahir`) VALUES
+(1, 'Dimas', 'Dimas@gmail.com', '1234', '01234567891', 'Bumiayu Brebes', 'pp.png', '2003-11-17'),
+(8, 'Test123', 'Test123@gmail.com', '1235', '12345678910', 'Test', 'pp.png', '2000-01-01'),
+(9, 'Test123', 'Test1234@gmail.com', '1234', '123412512412', 'Test', 'pp.png', '2000-01-01');
 
 -- --------------------------------------------------------
 
@@ -193,6 +207,25 @@ CREATE TABLE `orders` (
   `customerId` int(11) NOT NULL,
   `productId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `orders`
+--
+
+INSERT INTO `orders` (`id`, `quantity`, `customerId`, `productId`) VALUES
+(57, 1, 1, 1);
+
+--
+-- Trigger `orders`
+--
+DELIMITER $$
+CREATE TRIGGER `update_stock_after_order` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
+    UPDATE product
+    SET stok = stok - NEW.quantity
+    WHERE id = NEW.productId;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -274,6 +307,15 @@ CREATE TABLE `view_product_details` (
   `image` text DEFAULT NULL,
   `stok` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `available_products`
+--
+DROP TABLE IF EXISTS `available_products`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `available_products`  AS SELECT `product`.`id` AS `id`, `product`.`title` AS `title`, `product`.`price` AS `price`, `product`.`stok` AS `stok` FROM `product` WHERE `product`.`stok` > 00  ;
 
 --
 -- Indexes for dumped tables
@@ -379,7 +421,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT untuk tabel `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT untuk tabel `order_manager`

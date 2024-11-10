@@ -7,7 +7,7 @@ userPermissions();
 if(isset($_GET['pId'])){
     $pId = $_GET['pId']; 
 }
-
+// function
 if(isset($_SESSION['id'])){
     $idUser = $_SESSION['id'];
     $slecet = "SELECT *,orders.id AS orderID ,orders.quantity * product.price AS totalQuantity FROM orders JOIN product , customers WHERE customers.id = $idUser AND orders.productId = product.id AND customerId = customers.id;";

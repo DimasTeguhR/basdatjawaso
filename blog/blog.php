@@ -4,7 +4,7 @@ include "../genral/config.php";
 include "../genral/functions.php";
 include "../shared/header.php" ;
  include "../shared/nav.php" ;
-//  SELECT * FROM comment_blog JOIN blog , customers WHERE customers.id = comment_blog.customer_Id
+
 //  blog
  $slecet = "SELECT * FROM customers JOIN blog ON customers.id = blog.customerId";
 $s = mysqli_query($connectSQL ,$slecet );
